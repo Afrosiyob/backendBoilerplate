@@ -6,7 +6,7 @@ const { Token } = require("../models/models");
 
 const generateAccessToken = (userId) => ({
     accessToken: jwt.sign({ userId: userId, type: "access" },
-        config.get("jwtSecret"), { expiresIn: "1m" }
+        config.get("jwtSecret"), { expiresIn: "1d" }
     ),
 });
 
@@ -15,7 +15,7 @@ const generateRefreshToken = () => {
     return {
         tokenId: tokenId,
         refreshToken: jwt.sign({ tokenId: tokenId, type: "refresh" },
-            config.get("jwtSecret"), { expiresIn: "5m" }
+            config.get("jwtSecret"), { expiresIn: "30d" }
         ),
     };
 };
