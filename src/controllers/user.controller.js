@@ -1,25 +1,25 @@
-const { User } = require("../models/models");
-const bcrypt = require("bcryptjs");
-const _ = require("lodash");
-const { ApiError } = require("../errors/ApiError");
-const { logger } = require("../logger/logger");
-const { map } = require("lodash");
+const { User } = require( "../models/models" );
+const bcrypt = require( "bcryptjs" );
+const _ = require( "lodash" );
+const { ApiError } = require( "../errors/ApiError" );
+const { logger } = require( "../logger/logger" );
+const { map } = require( "lodash" );
 
 // ANCHOR create user controller
-const createUser = async(req, res, next) => {
+const createUser = async ( req, res, next ) => {
     const { username, password } = req.body;
-    const user = await User.findOne({ where: { username } });
-    if (!user) {
-        const hashedPassword = await bcrypt.hash(password, 12);
-        const newUser = await User.create({ username, password: hashedPassword });
+    const user = await User.findOne( { where: { username } } );
+    if ( !user ) {
+        const hashedPassword = await bcrypt.hash( password, 12 );
+        const newUser = await User.create( { username, password: hashedPassword } );
         await newUser.save();
-        res.status(200).json({ message: "new user created" });
+        res.status( 200 ).json( { data: newUser, message: "new user created" } );
     } else {
-        if (user instanceof User) {
-            logger.error("same username");
+        if ( user instanceof User ) {
+            logger.error( "same username" );
             next(
                 ApiError.BadRequestError(
-                    `failed ${username}`,
+                    `failed ${ username }`,
                     "please enter other username"
                 )
             );
@@ -28,54 +28,59 @@ const createUser = async(req, res, next) => {
 };
 
 // ANCHOR get all users without admin
-const getUsers = async(req, res, next) => {
-    await User.findAll({ where: { role: "user" } }).then((users) => {
-        res.status(200).json({
-            data: users.map((user) => ({
+const getUsers = async ( req, res, next ) => {
+    await User.findAll( { where: { role: "user" } } ).then( ( users ) => {
+        res.status( 200 ).json( {
+            data: users.map( ( user ) => ( {
                 id: user.id,
                 username: user.username,
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt,
-            })),
+            } ) ),
             message: "all users",
-        });
-    });
+        } );
+    } ).catch( ( error ) => {
+        console.log( error );
+        logger.error( error )
+        next( ApiError.NotFoundError( "user not founded or some error" ) )
+    } );
 };
 
 // ANCHOR get user controller
-const getUser = async(req, res, next) => {
+const getUser = async ( req, res, next ) => {
     const { userId } = req.params;
-    await User.findOne({ where: { id: userId } })
-        .then((user) => {
-            if (user.role === "admin") {
+    await User.findOne( { where: { id: userId } } )
+        .then( ( user ) => {
+            if ( user.role === "admin" ) {
                 next(
-                    ApiError.ForbiddenError("u cant take information about this userId")
+                    ApiError.ForbiddenError( "u cant take information about this userId" )
                 );
             } else {
-                res.status(200).json({
+                res.status( 200 ).json( {
                     data: user,
                     message: "single user data",
-                });
+                } );
             }
-        })
-        .catch((error) => {
-            console.log(error);
-            next(ApiError.BadRequestError(error, "wrong user id"));
-        });
+        } )
+        .catch( ( error ) => {
+            console.log( error );
+            logger.error( error )
+            next( ApiError.BadRequestError( error, "wrong user id" ) );
+        } );
 };
 
 // ANCHOR update user
-const updateUser = async(req, res, next) => {
+const updateUser = async ( req, res, next ) => {
     const { userId: userIdParam } = req.params;
     const { userId } = req.user;
     const { username } = req.body;
-    await User.findByPk(userIdParam).then(async(user) => {
-        const { role } = await User.findByPk(userId);
-        if (userId === user.id) {
+    await User.findByPk( userIdParam ).then( async ( user ) => {
+        const { role } = await User.findByPk( userId );
+        if ( userId === user.id ) {
             try {
                 user.username = username;
                 await user.save();
-                res.status(200).json({
+                res.status( 200 ).json( {
                     data: {
                         id: user.id,
                         username: user.username,
@@ -83,16 +88,16 @@ const updateUser = async(req, res, next) => {
                         updatedAt: user.updatedAt,
                     },
                     message: "user updated",
-                });
-            } catch (error) {
-                logger.error(error);
-                next(ApiError.ServerError(error));
+                } );
+            } catch ( error ) {
+                logger.error( error );
+                next( ApiError.ServerError( error ) );
             }
-        } else if (role === "admin") {
+        } else if ( role === "admin" ) {
             try {
                 user.username = username;
                 await user.save();
-                res.status(200).json({
+                res.status( 200 ).json( {
                     data: {
                         id: user.id,
                         username: user.username,
@@ -100,30 +105,38 @@ const updateUser = async(req, res, next) => {
                         updatedAt: user.updatedAt,
                     },
                     message: "user updated",
-                });
-            } catch (error) {
-                logger.error(error);
-                next(ApiError.ServerError(error));
+                } );
+            } catch ( error ) {
+                logger.error( error );
+                next( ApiError.ServerError( error ) );
             }
         } else {
-            next(ApiError.NotFoundError("not founded"));
+            next( ApiError.ForbiddenError( "you dont have a permission" ) );
         }
-    });
+    } ).catch( error => {
+        console.log( error );
+        logger.error( error )
+        next( ApiError.NotFoundError( "user not founded or some error" ) )
+    } );
 };
 
 // ANCHOR delete user
-const deleteUser = async(req, res, next) => {
+const deleteUser = async ( req, res, next ) => {
     const { userId: userIdParam } = req.params;
     const { userId } = req.user;
-    await User.findByPk(userIdParam).then(async(user) => {
-        const { role } = await User.findByPk(userId);
-        if (role === "admin") {
-            await User.destroy({ where: { id: user.id } }).then((deletedUser) => {
-                console.log(deletedUser);
-                res.status(200).json({ message: "user deleted" });
-            });
+    await User.findByPk( userIdParam ).then( async ( user ) => {
+        const { role } = await User.findByPk( userId );
+        if ( role === "admin" ) {
+            await User.destroy( { where: { id: user.id } } ).then( ( deletedUser ) => {
+                console.log( deletedUser );
+                res.status( 200 ).json( { message: "user deleted" } );
+            } );
         }
-    });
+    } ).catch( error => {
+        console.log( error );
+        logger.error( error )
+        next( ApiError.NotFoundError( "user not founded or some error" ) )
+    } );
 };
 
 module.exports = {
