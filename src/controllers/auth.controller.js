@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const _ = require("lodash");
 const config = require("config");
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 const { logger } = require("../logger/logger");
 
 const {
@@ -24,6 +24,7 @@ const updateTokens = async(userId) => {
     };
 };
 
+// ANCHOR auth login controller
 const authLogin = async(req, res, next) => {
     const { username, password } = req.body;
     const user = await User.findOne({ where: { username } });
@@ -40,12 +41,9 @@ const authLogin = async(req, res, next) => {
             );
         } else {
             const { id } = user;
-
             const token_info = await updateTokens(id).then((tokens) => tokens);
-
             res.status(200).json({
                 data: {
-                    // token,
                     token_info,
                     user_info: _.pick(user, ["username", "role"]),
                 },
@@ -55,6 +53,7 @@ const authLogin = async(req, res, next) => {
     }
 };
 
+// ANCHOR auth logout controller
 const authLogout = async(req, res, next) => {
     const { userId } = req.user;
     await Token.findOne({ where: { UserId: userId } })
@@ -74,6 +73,7 @@ const authLogout = async(req, res, next) => {
         });
 };
 
+// ANCHOR refresh  token controller
 const refreshTokens = async(req, res, next) => {
     const { refreshToken } = req.body;
     let decoded;
@@ -108,6 +108,7 @@ const refreshTokens = async(req, res, next) => {
         });
 };
 
+// ANCHOR auth me controller
 const authMe = async(req, res, next) => {
     const { userId } = req.user;
     const user = await User.findByPk(userId);

@@ -1,7 +1,6 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../../connection/connectPostgres");
 
-
 // User Model
 const User = sequelize.define(
     "User", {
@@ -26,7 +25,6 @@ const User = sequelize.define(
     }
 );
 
-
 const Token = sequelize.define(
     "Token", {
         id: {
@@ -43,12 +41,9 @@ const Token = sequelize.define(
     }
 );
 
-
-
 // Associations
 
 (async() => {
-
     // one-to-one => hasOne, belongsTo
     // Model1.hasOne(Model2)
     // Model2.belongsTo(Model1)
@@ -68,13 +63,9 @@ const Token = sequelize.define(
         },
     });
     Token.belongsTo(User);
-
-
-
 })();
-
 
 module.exports = {
     User,
-    Token
-}
+    Token,
+};

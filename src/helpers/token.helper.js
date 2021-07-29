@@ -1,9 +1,8 @@
-const jwt = require("jsonwebtoken")
-const config = require("config")
-const { v4: uuidv4 } = require("uuid")
-const { logger } = require("../logger/logger")
+const jwt = require("jsonwebtoken");
+const config = require("config");
+const { v4: uuidv4 } = require("uuid");
+const { logger } = require("../logger/logger");
 const { Token } = require("../models/models");
-
 
 const generateAccessToken = (userId) => ({
     accessToken: jwt.sign({ userId: userId, type: "access" },
@@ -24,7 +23,7 @@ const generateRefreshToken = () => {
 const replaceFromDBRefreshToken = async(tokenId, userId) =>
     await Token.findOne({ where: { UserId: userId } })
     .then(async(token) => {
-        if (token !== null) {
+        if (!token) {
             await Token.destroy({ where: { UserId: token.UserId } }).then(
                 async() => {
                     await Token.create({ tokenId: tokenId, UserId: userId })
