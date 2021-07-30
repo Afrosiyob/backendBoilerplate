@@ -39,25 +39,24 @@ const createUser = async(req, res, next) => {
 // ANCHOR get all users without admin
 const getUsers = async(req, res, next) => {
     const { page, size } = req.query;
-
+    // /api/user/list?page=1&size=5
     await User.findAndCountAll({
-        where: { role: "user" },
-        offset: parseInt(page),
-        limit: parseInt(size),
-    }).then((users) => {
-        res.send(users);
-    });
-
-    await User.findAll({ where: { role: "user" } })
+            where: { role: "user" },
+            offset: parseInt(page),
+            limit: parseInt(size),
+        })
         .then((users) => {
             res.status(200).json({
-                data: users.map((user) => ({
-                    id: user.id,
-                    username: user.username,
-                    createdAt: user.createdAt,
-                    updatedAt: user.updatedAt,
-                })),
-                message: "all users",
+                data: {
+                    count: users.count,
+                    users: users.rows.map((user) => ({
+                        id: user.id,
+                        username: user.username,
+                        role: user.role,
+                        createdAt: user.createdAt,
+                        updatedAt: user.updatedAt,
+                    })),
+                },
             });
         })
         .catch((error) => {
