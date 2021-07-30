@@ -23,7 +23,7 @@ const generateRefreshToken = () => {
 const replaceFromDBRefreshToken = async(tokenId, userId) =>
     await Token.findOne({ where: { UserId: userId } })
     .then(async(token) => {
-        if (!token) {
+        if (token) {
             await Token.destroy({ where: { UserId: token.UserId } }).then(
                 async() => {
                     await Token.create({ tokenId: tokenId, UserId: userId })

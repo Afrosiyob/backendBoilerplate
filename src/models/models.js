@@ -56,12 +56,7 @@ const Token = sequelize.define(
     // Model1.belongsToMany(Model2)
     // Model2.belongsToMany(Model1)
 
-    User.hasOne(Token, {
-        foreignKey: {
-            type: DataTypes.UUID,
-            allowNull: false,
-        },
-    });
+    User.hasOne(Token);
     Token.belongsTo(User);
 })();
 
