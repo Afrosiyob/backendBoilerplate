@@ -1,6 +1,6 @@
 const { Sequelize } = require( "sequelize" );
 const { logger } = require( "../src/logger/logger" );
-const { User } = require( "../src/models/models" );
+
 
 const sequelize = new Sequelize( "test_postgres", "postgres", "2230102ab", {
     host: "localhost",
