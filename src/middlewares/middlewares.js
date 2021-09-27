@@ -7,7 +7,7 @@ const path = require("path");
 const multer = require("multer");
 
 
-const validationError = async(req, res, next) => {
+const validationError = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         next(ApiError.BadRequestError(errors.array(), "badrequest error"));
@@ -16,7 +16,7 @@ const validationError = async(req, res, next) => {
     }
 };
 
-const checkAuthToken = async(req, res, next) => {
+const checkAuthToken = async (req, res, next) => {
     if (req.method === "OPTIONS") {
         await next();
     } else {
@@ -47,7 +47,7 @@ const checkAuthToken = async(req, res, next) => {
 };
 
 // Check permissions
-const setPermissions = (permissions) => async(req, res, next) => {
+const setPermissions = (permissions) => async (req, res, next) => {
     const { userId } = req.user;
     const user = await User.findByPk(userId);
     if (!user) {
