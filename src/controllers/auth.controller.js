@@ -53,6 +53,9 @@ const authLogin = async(req, res, next) => {
     }
 };
 
+
+
+
 // ANCHOR auth logout controller
 const authLogout = async(req, res, next) => {
     const { userId } = req.user;
