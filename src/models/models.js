@@ -4,46 +4,46 @@ const { sequelize } = require("../../connection/connectPostgres");
 // User Model
 const User = sequelize.define(
     "User", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-        },
-        username: {
-            type: DataTypes.STRING,
-        },
-        password: {
-            type: DataTypes.STRING,
-        },
-        role: {
-            type: DataTypes.STRING,
-            defaultValue: "user",
-        },
-    }, {
-        timestamps: true,
-        freezeTableName: true,
-    }
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+    },
+    username: {
+        type: DataTypes.STRING,
+    },
+    password: {
+        type: DataTypes.STRING,
+    },
+    role: {
+        type: DataTypes.STRING,
+        defaultValue: "user",
+    },
+}, {
+    timestamps: true,
+    freezeTableName: true,
+}
 );
 
 const Token = sequelize.define(
     "Token", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-        },
-        tokenId: {
-            type: DataTypes.STRING,
-        },
-    }, {
-        timestamps: true,
-        freezeTableName: true,
-    }
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+    },
+    tokenId: {
+        type: DataTypes.STRING,
+    },
+}, {
+    timestamps: true,
+    freezeTableName: true,
+}
 );
 
 // Associations
 
-(async() => {
+(async () => {
     // one-to-one => hasOne, belongsTo
     // Model1.hasOne(Model2)
     // Model2.belongsTo(Model1)
