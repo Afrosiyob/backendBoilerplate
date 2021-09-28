@@ -6,7 +6,7 @@ const { logger } = require("../logger/logger");
 const { map } = require("lodash");
 
 // ANCHOR create user controller
-const createUser = async(req, res, next) => {
+const createUser = async (req, res, next) => {
     const { username, password } = req.body;
     const user = await User.findOne({ where: { username } });
     if (!user) {
@@ -37,14 +37,14 @@ const createUser = async(req, res, next) => {
 };
 
 // ANCHOR get all users without admin
-const getUsers = async(req, res, next) => {
+const getUsers = async (req, res, next) => {
     const { page, size } = req.query;
     // /api/user/list?page=1&size=5
     await User.findAndCountAll({
-            where: { role: "user" },
-            offset: parseInt(page),
-            limit: parseInt(size),
-        })
+        where: { role: "user" },
+        offset: parseInt(page),
+        limit: parseInt(size),
+    })
         .then((users) => {
             res.status(200).json({
                 data: {
@@ -67,7 +67,7 @@ const getUsers = async(req, res, next) => {
 };
 
 // ANCHOR get user controller
-const getUser = async(req, res, next) => {
+const getUser = async (req, res, next) => {
     const { userId } = req.params;
     await User.findOne({ where: { id: userId } })
         .then((user) => {
@@ -90,12 +90,12 @@ const getUser = async(req, res, next) => {
 };
 
 // ANCHOR update user
-const updateUser = async(req, res, next) => {
+const updateUser = async (req, res, next) => {
     const { userId: userIdParam } = req.params;
     const { userId } = req.user;
     const { username } = req.body;
     await User.findByPk(userIdParam)
-        .then(async(user) => {
+        .then(async (user) => {
             const { role } = await User.findByPk(userId);
             if (userId === user.id) {
                 try {
@@ -143,11 +143,11 @@ const updateUser = async(req, res, next) => {
 };
 
 // ANCHOR delete user
-const deleteUser = async(req, res, next) => {
+const deleteUser = async (req, res, next) => {
     const { userId: userIdParam } = req.params;
     const { userId } = req.user;
     await User.findByPk(userIdParam)
-        .then(async(user) => {
+        .then(async (user) => {
             const { role } = await User.findByPk(userId);
             if (role === "admin") {
                 await User.destroy({ where: { id: user.id } }).then((deletedUser) => {
